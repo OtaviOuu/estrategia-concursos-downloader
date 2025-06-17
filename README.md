@@ -1,0 +1,1 @@
+# estrategia-concursos-downloader

@@ -2,14 +2,51 @@ import requests
 from pathlib import Path
 import os
 import questionary
+from seleniumbase import SB
 from parsel.selector import Selector
 
+
+auth_token = None
+
+def handle_cdp_event(event):
+    global auth_token
+    try:
+        auth_token = event["params"]["headers"]["authorization"]        
+    except KeyError:
+        pass
+
+def add_cdp_listener(driver):
+    driver.add_cdp_listener(
+        "Network.requestWillBeSentExtraInfo",
+        handle_cdp_event
+    )
+
+def get_auth_token():
+    # login = input("Digite o login: ")
+    # senha = input("Digite a senha: ")
+
+    with SB(uc=True, uc_cdp_events=True) as sb:
+        url = "https://perfil.estrategia.com/login"
+        sb.uc_open_with_reconnect(url, 2)
+        add_cdp_listener(sb.driver)
+
+        """
+        sb.type('input[name="loginField"]', login)
+        sb.type('input[name="passwordField"]', senha)
+        sb.click('button[type="submit"]')
+        """
+
+        sb.sleep(15)
+        sb.uc_open_with_reconnect("https://www.estrategiaconcursos.com.br/app/dashboard/cursos", 2)
+        print(auth_token)
+        sb.sleep(5)
 
 
 def make_session():
     session = requests.Session()
+    get_auth_token()
     headers = {
-        'authorization': 'Bearer ...',  # Substitua pelo seu token de autenticação
+        'authorization': auth_token, 
         'origin': 'https://www.estrategiaconcursos.com.br',
         'referer': 'https://www.estrategiaconcursos.com.br/',
     }
@@ -17,7 +54,6 @@ def make_session():
     return session
 
 def extrair_pdf_real(html_text):
-    from parsel.selector import Selector
     selector = Selector(text=html_text)
     content = selector.css('meta[http-equiv="refresh"]::attr(content)').get()
     if not content:
@@ -38,19 +74,17 @@ def selecionar_materias(course):
     return [(int(item.split("::")[-1]), item.split("::")[0]) for item in escolhas]
 
 def main():
-    base_url = "https://api.estrategiaconcursos.com.br/api"
+    base_api_url = "https://api.estrategiaconcursos.com.br/api"
     session = make_session()
-    user_courses_data = session.get(f'{base_url}/aluno/curso').json()
-
+    user_courses_data = session.get(f'{base_api_url}/aluno/curso').json()
     cursos_matriculados = user_courses_data["data"]["concursos"]
     curso_escolhido = selecionar_curso(cursos_matriculados)
     course_title = curso_escolhido["titulo"]
-    print(f"Curso selecionado: {course_title}")
 
     materias_escolhidas = selecionar_materias(curso_escolhido)
 
     for materia_id, materia_title in materias_escolhidas:
-        materias_aulas_data = session.get(f"{base_url}/aluno/curso/{materia_id}").json()
+        materias_aulas_data = session.get(f"{base_api_url}/aluno/curso/{materia_id}").json()
         aulas = materias_aulas_data["data"]["aulas"]
 
         for aula_index, aula in enumerate(aulas):

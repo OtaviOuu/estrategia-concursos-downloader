@@ -19,11 +19,5 @@ fi
 
 echo "📦 Instalando dependências com uv..."
 uv sync  
-
-gggggasfasdfsdffasfdsf
-if [ -f ./src/main.py ]; then
-    echo "🚀 Rodando main.py"
-    python ./src/main.py
-else
-    echo "⚠️ main.py não encontrado."
-fi
+source ./.venv/bin/activate
+python3 ./src/main.py

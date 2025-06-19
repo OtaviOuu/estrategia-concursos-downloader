@@ -38,9 +38,8 @@ def get_auth_token():
 
         sb.sleep(15)
         sb.uc_open_with_reconnect("https://www.estrategiaconcursos.com.br/app/dashboard/cursos", 2)
-        print(auth_token)
-        sb.sleep(5)
-
+        os.system("clear")
+        sb.sleep(2.5)
 
 def make_session():
     session = requests.Session()
@@ -96,7 +95,8 @@ def main():
                 pdf_real_url = extrair_pdf_real(aula_html.text)
                 pdf_bytes = session.get(pdf_real_url).content
 
-                path = Path(f"./{course_title}/{materia_title}/{aula_index:03d} - {aula_title}.pdf")
+            
+                path = Path(f"./{course_title.replace("/", "_")}/{materia_title.replace("/", "_")}/{aula_index:03d} - {aula_title}.pdf")
                 os.makedirs(path.parent, exist_ok=True)
                 print(f"Baixando [{materia_title}] aula {aula_index + 1}/{len(aulas)}: {aula_title}")
                 with path.open("wb") as f:

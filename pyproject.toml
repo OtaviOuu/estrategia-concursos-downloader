@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "parsel>=1.10.0",
+    "pyautogui>=0.9.54",
     "questionary>=2.1.0",
     "requests>=2.32.4",
     "seleniumbase>=4.39.5",

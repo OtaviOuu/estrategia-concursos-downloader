@@ -1,0 +1,6 @@
+services:
+  app:
+    build: .
+    container_name: coruja
+    working_dir: /app
+    command: python3 ./src/main.py

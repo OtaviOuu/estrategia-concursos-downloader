@@ -101,7 +101,7 @@ def main():
                 pdf_bytes = session.get(pdf_real_url).content
 
                 path = Path(
-                    f"./{course_title.replace('/', '_')}/{materia_title.replace('/', '_')}/{aula_index:03d} - {aula_title}.pdf"
+                    f"./pdfs/{course_title.replace('/', '_')}/{materia_title.replace('/', '_')}/{aula_index:03d} - {aula_title}.pdf"
                 )
                 os.makedirs(path.parent, exist_ok=True)
                 print(
